@@ -32,8 +32,8 @@ func sayHelloWorld(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	// func (mux *ServeMux) HandleFunc(pattern string, handler func(ResponseWriter, *Request))
-	http.HandleFunc("/", sayHelloWorld) // HandleFunc注册一个处理器函数handler和对应的模式pattern。
-	err := http.ListenAndServe(":9091", nil)
+	http.HandleFunc("/", sayHelloWorld)      // HandleFunc注册一个处理器函数handler和对应的模式pattern。
+	err := http.ListenAndServe(":9091", nil) //  调用的处理器，如为nil会调用http.DefaultServeMux
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
