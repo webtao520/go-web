@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"net/http"
 	"chitchat/handlers"
+	"net/http"
 )
 
 // 定义一个 WebRoute 结构体用于存放单个路由
@@ -17,20 +17,20 @@ type WebRoute struct {
 type WebRoutes []WebRoute
 
 // 定义所有 Web 路由
-var  webRoutes = WebRoutes{
+var webRoutes = WebRoutes{
 	// 首页
 	{
-        "home",
-        "GET",
-        "/",
-        handlers.Index,
+		"home",
+		"GET",
+		"/",
+		handlers.Index,
 	},
 	// 注册
 	{
-	   "signup",
-	   "GET",
-	   "/signup",
-	   handlers.Signup,
+		"signup",
+		"GET",
+		"/signup",
+		handlers.Signup,
 	},
 	// 注册信息入表
 	{
@@ -47,7 +47,7 @@ var  webRoutes = WebRoutes{
 		handlers.Login,
 	},
 	// 登陆验证
-	{	
+	{
 		"auth",
 		"POST",
 		"/authenticate",
@@ -61,17 +61,31 @@ var  webRoutes = WebRoutes{
 		handlers.Logout,
 	},
 	// 创建主题页面
-    {
-        "newThread",
-        "GET",
-        "/thread/new",
-        handlers.NewThread,
+	{
+		"newThread",
+		"GET",
+		"/thread/new",
+		handlers.NewThread,
 	},
 	//  创建主题后端逻辑
 	{
-        "createThread",
-        "POST",
-        "/thread/create",
-        handlers.CreateThread,
+		"createThread",
+		"POST",
+		"/thread/create",
+		handlers.CreateThread,
+	},
+	// 回复页面
+	{
+		"readThread",
+		"GET",
+		"/thread/read",
+		handlers.ReadThread,
+	},
+	// 回复逻辑
+	{
+		"postThread",
+		"POST",
+		"/thread/post",
+		handlers.PostThread,
 	},
 }

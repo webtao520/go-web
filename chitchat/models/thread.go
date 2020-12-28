@@ -7,13 +7,12 @@ import (
 )
 
 type Thread struct {
-    Id        int
-    Uuid      string
-    Topic     string
-    UserId    int
-    CreatedAt time.Time
+	Id        int
+	Uuid      string
+	Topic     string
+	UserId    int
+	CreatedAt time.Time
 }
-
 
 // 获取数据库中的所有线程并返回它
 func Threads() (threads []Thread, err error) {
@@ -32,8 +31,32 @@ func Threads() (threads []Thread, err error) {
 	return
 }
 
+// format the CreatedAt date to display nicely on the screen
+func (thread *Thread) CreatedAtDate() string {
+	return thread.CreatedAt.Format("Jan 2, 2006 at 3:04pm")
+}
 
-// Get the user who started this thread
+// 获取主题数量
+func (thread *Thread) NumReplies() (count int) {
+	rows, err := Db.Query("SELECT count(*) FROM posts where thread_id = ?", thread.Id)
+	if err != nil {
+		return
+	}
+	/*
+		Next为使用扫描方法读取下一个结果行做准备。如果成功，它将返回true，如果没有下一个结果行或在准备它时发生错误，
+		则返回false。应参考Err来区分这两种情况。
+		每次对Scan的调用，即使是第一次调用，都必须在对Next的调用之前。
+	*/
+	for rows.Next() {
+		if err = rows.Scan(&count); err != nil {
+			return
+		}
+	}
+	rows.Close()
+	return
+}
+
+// 获取创建的主题的用户数
 func (thread *Thread) User() (user User) {
 	user = User{}
 	Db.QueryRow("SELECT id, uuid, name, email, created_at FROM users WHERE id = ?", thread.UserId).
@@ -41,22 +64,26 @@ func (thread *Thread) User() (user User) {
 	return
 }
 
-
-// format the CreatedAt date to display nicely on the screen
-func (thread *Thread) CreatedAtDate() string {
-	return thread.CreatedAt.Format("Jan 2, 2006 at 3:04pm")
+// Get a thread by the uuid
+func ThreadByUUID(uuid string) (conv Thread, err error) {
+	conv = Thread{}
+	err = Db.QueryRow("SELECT id, uuid, topic, user_id, created_at FROM threads WHERE uuid = ?", uuid).
+		Scan(&conv.Id, &conv.Uuid, &conv.Topic, &conv.UserId, &conv.CreatedAt)
+	return
 }
 
-// get the number of posts in a thread
-func (thread *Thread) NumReplies() (count int) {
-	rows, err := Db.Query("SELECT count(*) FROM posts where thread_id = ?", thread.Id)
+// get posts to a thread
+func (thread *Thread) Posts() (posts []Post, err error) {
+	rows, err := Db.Query("SELECT id, uuid, body, user_id, thread_id, created_at FROM posts where thread_id = ?", thread.Id)
 	if err != nil {
 		return
 	}
 	for rows.Next() {
-		if err = rows.Scan(&count); err != nil {
+		post := Post{}
+		if err = rows.Scan(&post.Id, &post.Uuid, &post.Body, &post.UserId, &post.ThreadId, &post.CreatedAt); err != nil {
 			return
 		}
+		posts = append(posts, post)
 	}
 	rows.Close()
 	return

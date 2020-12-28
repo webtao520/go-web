@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"chitchat/models"
 	_ "chitchat/models"
 	"net/http"
 )
@@ -39,3 +40,17 @@ func CreateThread(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// GET / thread/read
+// 通过 ID 渲染指定全组页面
+func ReadThread(writer http.ResponseWriter, request *http.Request) {
+	vals := request.URL.Query()
+	uuid := vals.Get("id")
+	thread, _ := models.ThreadByUUID(uuid)
+	// TODO 本地化
+	_, err := session(writer, request)
+	if err != nil {
+		generateHTML(writer, &thread, "layout", "navbar", "thread")
+	} else {
+		generateHTML(writer, &thread, "layout", "auth.navbar", "auth.thread")
+	}
+}
