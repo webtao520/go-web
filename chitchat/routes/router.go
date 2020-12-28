@@ -1,13 +1,13 @@
 package routes
 
 import (
-_	"fmt"
+	_ "fmt"
 
 	"github.com/gorilla/mux"
 )
 
 // 返回一个 mux.Router 类型指针，从而可以当作处理器使用
-func NewRouter() *mux.Router{
+func NewRouter() *mux.Router {
 	// 创建 mux.Router 路由器示例
 	router := mux.NewRouter().StrictSlash(true)
 

@@ -39,6 +39,39 @@ var  webRoutes = WebRoutes{
 		"/signup_account",
 		handlers.SignupAccount,
 	},
-	
-	
+	//登陆
+	{
+		"login",
+		"GET",
+		"/login",
+		handlers.Login,
+	},
+	// 登陆验证
+	{	
+		"auth",
+		"POST",
+		"/authenticate",
+		handlers.Authenticate,
+	},
+	// 退出
+	{
+		"logout",
+		"GET",
+		"/logout",
+		handlers.Logout,
+	},
+	// 创建主题页面
+    {
+        "newThread",
+        "GET",
+        "/thread/new",
+        handlers.NewThread,
+	},
+	//  创建主题后端逻辑
+	{
+        "createThread",
+        "POST",
+        "/thread/create",
+        handlers.CreateThread,
+	},
 }

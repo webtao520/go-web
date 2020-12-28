@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"chitchat/config"
+	"chitchat/models"
+	"errors"
 	"fmt"
 	"html/template"
 	"log"
@@ -25,14 +27,25 @@ func init() {
 	logger = log.New(file, "INFO", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
+// 检查用户是否已登录并拥有一个会话，如果不是err则不是nil
+func session(writer http.ResponseWriter, request *http.Request) (sess models.Session, err error) {
+	cookie, err := request.Cookie("_cookie")
+	if err == nil {
+		sess = models.Session{Uuid: cookie.Value}
+		if ok, _ := sess.Check(); !ok {
+			err = errors.New("Invalid session")
+		}
+	}
+	return
+}
+
 // 生成 HTML 模板 generateHTML(writer, threads, "layout", "auth.navbar", "index")
-// template  包使用介绍
+// template  包使用介绍 TODO
 func generateHTML(writer http.ResponseWriter, data interface{}, filenames ...string) {
 	var files []string
 	for _, file := range filenames {
 		files = append(files, fmt.Sprintf("views/%s/%s.html", config.ViperConfig.App.Language, file))
 	}
-	//fmt.Println("====>>>", formatDate)
 	funcMap := template.FuncMap{"fdate": formatDate}
 	t := template.New("layout").Funcs(funcMap)
 	templates := template.Must(t.ParseFiles(files...))

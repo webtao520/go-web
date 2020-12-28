@@ -1,25 +1,27 @@
 package models
 
 import (
+	"crypto/rand"
+    "crypto/sha1"
 	"chitchat/config"
 	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
 	"fmt"
 	"log"
 )
 
-var Db *sql.DB  // 的数据库句柄
+var Db *sql.DB // 数据库句柄
 
-func init (){
-	var err error
-	driver:=config.ViperConfig.Db.Driver
-	// 连接mysql
-	source:=fmt.Sprintf("%s:%s@(%s)/%s?charset=utf8&parseTime=true",config.ViperConfig.Db.User,config.ViperConfig.Db.Password,
-config.ViperConfig.Db.Address,config.ViperConfig.Db.Database)
-	Db,err=sql.Open(driver,source)
-	if err !=nil {
-		log.Fatal(err)
-	}
-	return
+func init() {
+    var err error
+    driver := config.ViperConfig.Db.Driver
+    source := fmt.Sprintf("%s:%s@(%s)/%s?charset=utf8&parseTime=true", config.ViperConfig.Db.User, config.ViperConfig.Db.Password,
+        config.ViperConfig.Db.Address, config.ViperConfig.Db.Database)
+    Db, err = sql.Open(driver, source)
+    if err != nil {
+        log.Fatal(err)
+    }
+    return
 }
 
 
