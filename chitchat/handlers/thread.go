@@ -4,6 +4,8 @@ import (
 	"chitchat/models"
 	_ "chitchat/models"
 	"net/http"
+
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 // GET / /threads/new
@@ -45,12 +47,20 @@ func CreateThread(writer http.ResponseWriter, request *http.Request) {
 func ReadThread(writer http.ResponseWriter, request *http.Request) {
 	vals := request.URL.Query()
 	uuid := vals.Get("id")
-	thread, _ := models.ThreadByUUID(uuid)
-	// TODO 本地化
-	_, err := session(writer, request)
+	thread, err := models.ThreadByUUID(uuid)
+	// 本地化
 	if err != nil {
-		generateHTML(writer, &thread, "layout", "navbar", "thread")
+		msg := localizer.MustLocalize(&i18n.LocalizeConfig{
+			MessageID: "thread_not_found",
+		})
+		errorMessage(writer, request, msg)
 	} else {
-		generateHTML(writer, &thread, "layout", "auth.navbar", "auth.thread")
+		_, err := session(writer, request)
+		if err != nil {
+			generateHTML(writer, &thread, "layout", "navbar", "thread")
+		} else {
+			generateHTML(writer, &thread, "layout", "auth.navbar", "auth.thread")
+		}
 	}
+
 }

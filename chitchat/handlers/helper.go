@@ -9,12 +9,19 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
+
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 var logger *log.Logger
+var localizer *i18n.Localizer
 
 func init() {
+	// 初始化 Localizer 以便被所有处理器方法使用
+	localizer = i18n.NewLocalizer(config.ViperConfig.LocaleBundle, config.ViperConfig.App.Language)
+
 	// 日志初始化
 	file, err := os.OpenFile(config.ViperConfig.App.Log+"/chitchat.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
@@ -46,6 +53,7 @@ func generateHTML(writer http.ResponseWriter, data interface{}, filenames ...str
 	for _, file := range filenames {
 		files = append(files, fmt.Sprintf("views/%s/%s.html", config.ViperConfig.App.Language, file))
 	}
+	//  generateHTML 方法中将这个函数通过 template.FuncMap 组装后再通过 Funcs 方法应用到视图模板中
 	funcMap := template.FuncMap{"fdate": formatDate}
 	t := template.New("layout").Funcs(funcMap)
 	templates := template.Must(t.ParseFiles(files...))
@@ -72,4 +80,10 @@ func info(args ...interface{}) {
 func warning(args ...interface{}) {
 	logger.SetPrefix("WARNING ")
 	logger.Println(args...)
+}
+
+//异常处理统一重定向道错误页面
+func errorMessage(writer http.ResponseWriter, request *http.Request, msg string) {
+	url := []string{"/err?msg=", msg}
+	http.Redirect(writer, request, strings.Join(url, ""), 302)
 }

@@ -1,6 +1,8 @@
 package config
 
-import _"github.com/nicksnyder/go-i18n/v2/i18n"
+import (
+	"github.com/nicksnyder/go-i18n/v2/i18n"
+)
 
 //  系统配置
 type App struct {
@@ -22,5 +24,8 @@ type Database struct {
 type Configuration struct {
 	App          App
 	Db           Database
+	LocaleBundle *i18n.Bundle
 }
 
+//var config *Configuration
+//var once sync.Once
