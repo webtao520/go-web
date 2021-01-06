@@ -30,6 +30,7 @@ func init() {
 	beego.AddFuncMap("IndexForOne", utils.IndexForOne)
 	beego.AddFuncMap("IndexDecrOne", utils.IndexDecrOne)
 	beego.AddFuncMap("IndexAddOne", utils.IndexAddOne)
+	beego.AddFuncMap("StringReplace", utils.StringReplace)
 }
 
 func main() {
