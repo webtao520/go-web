@@ -21,11 +21,12 @@ func init() {
 			命名空间包含ControllerInterface
 		*/
 		beego.NSInclude(
-			&admin.MenuController{}, // 导航管理
+			//&admin.MenuController{}, // 导航管理
 			&admin.CronController{}, // 文章管理 - 文章抓取
 		),
 		//************************* 文章管理 - 文章抓取 ***********************************
 		//beego.NSRouter("/get-review", &admin.CronController{}, "get:GetReview"),
+		beego.NSRouter("/article/get", &admin.ArticleResourcesController{}, "Post:GetArticle"),
 
 		//************************* 用户管理 ***********************************
 		beego.NSRouter("/user", &admin.UserController{}, "get:List;post:Save"),
