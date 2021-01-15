@@ -321,7 +321,7 @@ func (c *ArticleController) Top() {
 			article.Recommend = 0
 		}
 
-		if _, err := o.Update(&article,"Recommend"); err == nil { // Update 默认更新所有的字段，可以更新指定的字段
+		if _, err := o.Update(&article, "Recommend"); err == nil { // Update 默认更新所有的字段，可以更新指定的字段
 			response["msg"] = "操作成功！"
 			response["code"] = 200
 			response["id"] = id
@@ -342,12 +342,148 @@ func (c *ArticleController) Top() {
 }
 
 // 删除文章
-func (c *ArticleController) Delete(){
+func (c *ArticleController) Delete() {
 	// 获取删除 id 号
-	id,_:=c.GetInt("id",0)	
+	id, _ := c.GetInt("id", 0)
 
 	//响应信息 开辟内存空间  只开辟内存空间才能使用
-	response :=make(map[string]interface{})
+	response := make(map[string]interface{})
+
+	o := orm.NewOrm()
+	article := admin.Article{Id: id}
+	// 1. 判断文章是否存在
+	if o.Read(&article) == nil {
+		article.Status = 3
+		if _, err := o.Update(&article); err == nil {
+			// 2. 存在进行删除
+			response["msg"] = "删除成功！"
+			response["code"] = 200
+			response["id"] = id
+		} else {
+			response["msg"] = "删除失败"
+			response["code"] = 500
+			response["err"] = err.Error()
+		}
+	} else {
+		response["msg"] = "删除失败"
+		response["code"] = 500
+		response["err"] = "ID 不能为空"
+	}
+
+	c.Data["json"] = response
+	c.ServeJSON()
+	c.StopRun()
+}
+
+// 修改文章页面
+func (c *ArticleController) Put(){
+  id,err:=c.GetInt("id",0)
+  if id == 0{
+	  c.Abort("404")
+  }
+  // 基础数据
+  o:=orm.NewOrm()
+  article:=new(admin.Article)
+  var articles admin.Article
+  qs:=o.QueryTable(article)
+  err=qs.Filter("id",id).One(&articles) // 尝试返回单条记录
+  if err !=nil{
+	  c.Abort("404")
+  }
+//   fmt.Println("===================>",articles) // ===================> {20 特使团 特殊 二恶 二二哦而呃呃热而哦 <p>二二哦而呃呃热而哦</p>
+	//c.Data["Data"] = 	articles
+	// c.Data["json"]= articles
+	// c.ServeJSON()
+	// c.StopRun()
+
+	c.Data["Data"] = articles
+
+	// 分类数据
+	//o=orm.NewOrm()
+	category:=new(admin.Category)
+	var categorys []*admin.Category
+	qs=o.QueryTable(category)
+	qs=qs.Filter("status",1)
+	qs.All(&categorys)
+	
+  	c.Data["Category"]= categorys
+	// c.ServeJSON()
+	// c.StopRun()
+
+	c.TplName = "admin/article-edit.html"
+}
 
 
+var response map[string]interface{} = make(map[string]interface{})
+//var o = orm.NewOrm()
+
+// 更新文章
+func (c *ArticleController) Update() {
+	id, _ := c.GetInt("id", 0)
+	title := c.GetString("title")
+	tag := c.GetString("tag")
+	cate, _ := c.GetInt("cate", 0)
+	remark := c.GetString("remark")
+	desc := c.GetString("desc_content")
+	html := c.GetString("desc_html")
+	url := c.GetString("url")
+	cover := c.GetString("cover")
+	/*c.Data["json"] = c.Input()
+	c.ServeJSON()
+	c.StopRun()*/
+
+	//response := make(map[string]interface{})
+
+	o := orm.NewOrm()
+
+	article := admin.Article{Id: id}
+	if o.Read(&article) == nil {
+		article.Title = title
+		article.Tag = tag
+		article.Desc = desc
+		article.Html = html
+		article.Remark = remark
+		article.Url = url
+		article.Cover = cover
+		valid := validation.Validation{}
+		valid.Required(article.Title, "Title")
+		valid.Required(article.Tag, "Tag")
+		valid.Required(article.Desc, "Desc")
+		valid.Required(article.Html, "Html")
+		//valid.Required(article.Remark, "Remark")
+
+		if valid.HasErrors() {
+			// 如果有错误信息，证明验证没通过
+			// 打印错误信息
+			for _, err := range valid.Errors {
+				//log.Println(err.Key, err.Message)
+				response["msg"] = "新增失败！"
+				response["code"] = 500
+				response["err"] = err.Key + " " + err.Message
+				c.Data["json"] = response
+				c.ServeJSON()
+				c.StopRun()
+			}
+		}
+
+		article.Category = &admin.Category{cate, "", 0, 0, 0}
+
+		if _, err := o.Update(&article); err == nil {
+			response["msg"] = "修改成功！"
+			response["code"] = 200
+			response["id"] = id
+		} else {
+			response["msg"] = "修改失败！"
+			response["code"] = 500
+			response["err"] = err.Error()
+		}
+	} else {
+		response["msg"] = "修改失败！"
+		response["code"] = 500
+		response["err"] = "ID 不能为空！"
+	}
+
+	c.Data["json"] = response
+	c.ServeJSON()
+	c.StopRun()
 }

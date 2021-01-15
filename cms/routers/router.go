@@ -32,6 +32,8 @@ func init() {
 		beego.NSRouter("/article/add", &admin.ArticleController{}, "get:Add"),
 		beego.NSRouter("/article/top", &admin.ArticleController{}, "Post:Top"),
 		beego.NSRouter("/article/delete", &admin.ArticleController{}, "Post:Delete"),
+		beego.NSRouter("/article/edit", &admin.ArticleController{}, "get:Put"),
+		beego.NSRouter("/article/update", &admin.ArticleController{}, "Post:Update"),
 		//************************* 用户管理 ***********************************
 		beego.NSRouter("/user", &admin.UserController{}, "get:List;post:Save"),
 		beego.NSRouter("/user/add", &admin.UserController{}, "get:Add"),
