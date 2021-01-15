@@ -27,7 +27,11 @@ func init() {
 		//************************* 文章管理 - 文章抓取 ***********************************
 		//beego.NSRouter("/get-review", &admin.CronController{}, "get:GetReview"),
 		beego.NSRouter("/article/get", &admin.ArticleResourcesController{}, "Post:GetArticle"),
-
+		//************************* 文章管理 - 文章列表 ***********************************
+		beego.NSRouter("/article", &admin.ArticleController{}, "get:List;post:Save"),
+		beego.NSRouter("/article/add", &admin.ArticleController{}, "get:Add"),
+		beego.NSRouter("/article/top", &admin.ArticleController{}, "Post:Top"),
+		beego.NSRouter("/article/delete", &admin.ArticleController{}, "Post:Delete"),
 		//************************* 用户管理 ***********************************
 		beego.NSRouter("/user", &admin.UserController{}, "get:List;post:Save"),
 		beego.NSRouter("/user/add", &admin.UserController{}, "get:Add"),

@@ -15,6 +15,7 @@ import (
 func init() {
 	// 读取配置信息
 	conf, err := config.NewConfig("ini", "conf/app.conf")
+	orm.Debug = true
 
 	if err != nil {
 		// Fatalf在标准日志记录器上以Fatal级别记录消息，然后进程将退出并将状态设置为1。
